@@ -16,7 +16,7 @@ This bot uses *selenium* to automate message replies and provide a ton of inform
 
 ## How to Install
 
-1. git clone https://github.com/bejoyas/Whatsapp_bot
+1. git clone https://github.com/bejoyas/Whatsapp_bot.git
 2. cd whatsapp_bot
 3. python3 rash2.py
 
@@ -64,5 +64,4 @@ For weather info:
 Weather
 ```
 ---
-Thank you..
-Support as [here](github.com/bejoyas/Whatsapp_bot)
+**Thank you.. **
