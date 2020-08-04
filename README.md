@@ -65,4 +65,4 @@ Weather
 ```
 ---
 Thank you..
-Support as [here](github.com/bejoyas)
+Support as [here](github.com/bejoyas/whatsapp_bot)
