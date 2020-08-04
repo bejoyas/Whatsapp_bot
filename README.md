@@ -6,7 +6,7 @@ A **bot** that provides you with every possible information on Internet
 
 This bot uses *selenium* to automate message replies and provide a ton of information scraped from the internet
 
-##Functionalities
+## Functionalities
 
 1. Get news headlines
 2. Get top Youtube videos
@@ -14,17 +14,17 @@ This bot uses *selenium* to automate message replies and provide a ton of inform
 4. Get Wikipedia results
 5. Get word meanings
 
-##How to Install
+## How to Install
 
 1. git clone https://github.com/bejoyas/whatsapp_bot
 2. cd whatsapp_bot
 3. python3 rash2.py
 
-##Usage
+## Usage
 
 The whatsapp_bot works on certain keywords from your whatsapp messages to provide the corresponding result
 
-###News
+### News
 
 For daily top news headlines :
 
@@ -32,7 +32,7 @@ For daily top news headlines :
 news <topic>
 ```
 
-###Youtube videos
+### Youtube videos
 
 For getting top videos :
 
@@ -40,7 +40,7 @@ For getting top videos :
 yt <keyword>
 ```
 
-###Searching Wikipedia
+### Searching Wikipedia
 
 For searching something on wiki:
 
@@ -48,7 +48,7 @@ For searching something on wiki:
 wiki <searchterm>
 ```
 
-###Word meanings
+### Word meanings
 
 For searching for a word meaning:
 
@@ -56,7 +56,7 @@ For searching for a word meaning:
 def <word>
 ```
 
-###weather
+### Weather
 
 For weather info:
 
