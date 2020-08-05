@@ -30,7 +30,19 @@ repeat = ''
 sleep(1)
 browser = webdriver.Firefox(executable_path=r'/root/Downloads/geckodriver')
 browser.get('https://web.whatsapp.com')
+def fnews(query):
+	url="https://www.google.com/search?client=firefox-b-e&biw=772&bih=646&tbs=sbd%3A1&tbm=nws&ei=OYoqX47bH8uxggfs6JSwBQ&q="+query
+	content = requests.get(url.encode()).content
+	soup=bs(content,"html.parser")
 
+	newss=soup.find_all('div', attrs={'class':'kCrYT'})
+
+	for news in newss:
+	    send(news.get_text()+"\n")
+	    link= (news.find("a").get("href"))
+	    link=re.sub("/url\?q=","",link)
+	    #send("Read More:: "+link+"\n")
+	    send(news.get_text()+"\n"+"Read More:: "+link+"\n")
 def yt(query):
 
 
@@ -74,27 +86,6 @@ def yt(query):
 	print(counts)
 	for i in range(5):
 	    send(vdo_list[i]+">>>>"+link_list[i])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 def kuki(mess):
 	url="https://miapi.pandorabots.com/talk"
@@ -411,6 +402,11 @@ while True:
 				del terms[0]
 				search_term=' '.join(terms)
 				yt(search_term)
+			elif "fnews" in message.text.lower():
+				terms=message.text.split()
+				del terms[0]
+				search_term=' '.join(terms)
+				fnews(search_term)
 	except Exception as e:
 
 		print(e)
