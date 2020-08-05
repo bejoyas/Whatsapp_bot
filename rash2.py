@@ -41,7 +41,7 @@ def fn(query):
 		#send(news.get_text()+"\n")
 		link= (news.find("a").get("href"))
 		link=re.sub("/url\?q=","",link)
-		link=re.sub("&usg.*","",link)
+		link=re.sub("&.*","",link)
 		#send("Read More:: "+link+"\n")
 		send(news.get_text()+"\n"+"Read More:: "+link+"\n")
 def yt(query):
