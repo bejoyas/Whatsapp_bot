@@ -2,11 +2,7 @@ import json
 import os
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support ielif "yt" in message.text.lower():
-				terms=message.text.split()
-				del terms[0]
-				search_term=' '.join(terms)
-				yt(search_term)mport expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
