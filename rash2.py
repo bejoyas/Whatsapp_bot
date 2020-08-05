@@ -30,7 +30,7 @@ repeat = ''
 sleep(1)
 browser = webdriver.Firefox(executable_path=r'/root/Downloads/geckodriver')
 browser.get('https://web.whatsapp.com')
-def fnews(query):
+def fn(query):
 	url="https://www.google.com/search?client=firefox-b-e&biw=772&bih=646&tbs=sbd%3A1&tbm=nws&ei=OYoqX47bH8uxggfs6JSwBQ&q="+query
 	content = requests.get(url.encode()).content
 	soup=bs(content,"html.parser")
@@ -403,11 +403,11 @@ while True:
 				del terms[0]
 				search_term=' '.join(terms)
 				yt(search_term)
-			elif "fnews" in message.text.lower():
+			elif "fnws" in message.text.lower():
 				terms=message.text.split()
 				del terms[0]
 				search_term=' '.join(terms)
-				fnews(search_term)
+				fn(search_term)
 	except Exception as e:
 
 		print(e)
