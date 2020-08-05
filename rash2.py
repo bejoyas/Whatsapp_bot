@@ -38,12 +38,12 @@ def fnews(query):
 	newss=soup.find_all('div', attrs={'class':'kCrYT'})
 
 	for news in newss:
-	    #send(news.get_text()+"\n")
-	    link= (news.find("a").get("href"))
-	    link=re.sub("/url\?q=","",link)
+		#send(news.get_text()+"\n")
+		link= (news.find("a").get("href"))
+		link=re.sub("/url\?q=","",link)
 		link=re.sub("&usg.*","",link)
-	    #send("Read More:: "+link+"\n")
-	    send(news.get_text()+"\n"+"Read More:: "+link+"\n")
+		#send("Read More:: "+link+"\n")
+		send(news.get_text()+"\n"+"Read More:: "+link+"\n")
 def yt(query):
 
 
@@ -68,25 +68,25 @@ def yt(query):
 	links=soup.find_all("a")
 	vids=soup.find_all("h3")
 	for link in links:
-	    if "https://www.youtube.com/" in (link.get("href")):
-	        x=link.get("href")
-	        x=re.sub("\/url\?q=","",x)
-	        x=re.sub("&sa=.*","",x)
-	        x=urllib.parse.unquote(x)
-	        if x not in link_list:
-	            link_list.append(x)
+		if "https://www.youtube.com/" in (link.get("href")):
+			x=link.get("href")
+			x=re.sub("\/url\?q=","",x)
+			x=re.sub("&sa=.*","",x)
+			x=urllib.parse.unquote(x)
+			if x not in link_list:
+				link_list.append(x)
 
-	            print(x)
-	            count+=1
+				print(x)
+				count+=1
 	print(count)
 	for vid in vids:
-	    print(vid.get_text())
-	    vdo_list.append(vid.get_text())
+		print(vid.get_text())
+		vdo_list.append(vid.get_text())
 
-	    counts+=1
+		counts+=1
 	print(counts)
 	for i in range(5):
-	    send(vdo_list[i]+">>>>"+link_list[i])
+		send(vdo_list[i]+">>>>"+link_list[i])
 
 def kuki(mess):
 	url="https://miapi.pandorabots.com/talk"
