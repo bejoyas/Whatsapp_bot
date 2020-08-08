@@ -66,20 +66,41 @@ def send_message(message):
 
 
 def fn(query):
-	print("reached here")
+	import requests
+	from bs4 import BeautifulSoup as bs
+	import sys
+	import re
+
 	url="https://www.google.com/search?client=firefox-b-e&biw=772&bih=646&tbs=sbd%3A1&tbm=nws&ei=OYoqX47bH8uxggfs6JSwBQ&q="+query
 	content = requests.get(url.encode()).content
 	soup=bs(content,"html.parser")
 
-	newss=soup.find_all('div', attrs={'class':'kCrYT'})
+	newss=soup.find_all('div', attrs={'class':'BNeawe s3v9rd AP7Wnd'})
+	links=soup.find_all('div', attrs={'class':'kCrYT'})
+	heads=newss=soup.find_all('div', attrs={'class':'BNeawe vvjwJb AP7Wnd'})
+	# print(newss)
+	# print(heads)
+	for i in range(0,5,2):
+	    #send(news.get_text()+"\n")
+	    head=heads[int(i/2)].get_text()
+	    #news=newss[i].get_text()
+	    news="\n"+links[i+1].get_text()
+	    link= (links[i].find("a").get("href"))
+	    # print(link)
+	    link=re.sub("/url\?q=","",link)
+	    link=re.sub("&.*","",link)
+	    link_to_shorten="https://tinyurl.com/create.php?source=indexpage&url="+link
+	    tiny_url=requests.get(link_to_shorten).content
+	    tiny_soup=bs(tiny_url,"html.parser")
 
-	for news in newss:
-		#send(news.get_text()+"\n")
-		link= (news.find("a").get("href"))
-		link=re.sub("/url\?q=","",link)
-		link=re.sub("&.*","",link)
-		#send("Read More:: "+link+"\n")
-		send_message(news.get_text()+"\n"+"Read More:: "+link+"\n")
+	    shrt_link=tiny_soup.find_all('b')[1].get_text()
+	    print(shrt_link)
+	    send_message(head+"\n"+news+"\nRead more at: "+shrt_link+"\n")
+
+	    #rint("Read More:: "+link+"\n")
+
+	    #print("Read More:: "+link)
+
 
 
 def youtube():
@@ -199,8 +220,8 @@ def news(search="kerala"):
 
 	for i in range(5):
 
-		send("*"+articles["articles"][i]["title"].upper()+"*"+"\n"+articles["articles"][i]["description"]+"\nRead more: "+articles["articles"][i]["url"])
-		send("Read more: "+articles["articles"][i]["url"] )
+		send_message("*"+articles["articles"][i]["title"].upper()+"*"+"\n"+articles["articles"][i]["description"]+"\nRead more: "+articles["articles"][i]["url"])
+		# send("Read more: "+articles["articles"][i]["url"] )
 
 def top_lines():
 	from newsapi import NewsApiClient as nac
@@ -214,9 +235,10 @@ def top_lines():
 		send("Read more: "+top_headlines["articles"][i]["url"])
 
 def morning():
-	print("1 min")
-	fn("funny news malayalam")
-	print("1 min")
+	news_topics=["kerala latest","malayalam hot news","headlines","funny news malayalam"]
+	news_topic=random.choice(news_topics)
+	fn(news_topic)
+
 def insta():
 	accounts=["criticscut","9gag","ffc.trolls","trollmovies","ar._beatz"]
 	account=random.choice(accounts)
@@ -225,10 +247,11 @@ def insta():
 schedule.every(3).hours.do(youtube)
 schedule.every(2).hours.do(insta)
 schedule.every().day.at("07:30").do(news)
+schedule.every(0.2).minutes.do(morning)
 
 
 
 
 while True:
 	schedule.run_pending()
-	time.sleep(4)
+	time.sleep(1)
