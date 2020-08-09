@@ -1,21 +1,21 @@
-import json
-import os
+
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
-import sys
+from bs4 import BeautifulSoup as bs
+from newsapi import NewsApiClient as nac
 from time import sleep
-import re
 import json
+import os
+import sys
+import re
 import regex
 import random
 import time
 import requests
-from bs4 import BeautifulSoup as bs
-from newsapi import NewsApiClient as nac
 import schedule
 try:
 	import autoit
@@ -66,10 +66,9 @@ def send_message(message):
 
 
 def fn(query):
-	import requests
-	from bs4 import BeautifulSoup as bs
-	import sys
-	import re
+
+	from googletrans import Translator
+	translator = Translator()
 
 	url="https://www.google.com/search?client=firefox-b-e&biw=772&bih=646&tbs=sbd%3A1&tbm=nws&ei=OYoqX47bH8uxggfs6JSwBQ&q="+query
 	content = requests.get(url.encode()).content
@@ -81,25 +80,27 @@ def fn(query):
 	# print(newss)
 	# print(heads)
 	for i in range(0,5,2):
-	    #send(news.get_text()+"\n")
-	    head=heads[int(i/2)].get_text()
-	    #news=newss[i].get_text()
-	    news="\n"+links[i+1].get_text()
-	    link= (links[i].find("a").get("href"))
-	    # print(link)
-	    link=re.sub("/url\?q=","",link)
-	    link=re.sub("&.*","",link)
-	    link_to_shorten="https://tinyurl.com/create.php?source=indexpage&url="+link
-	    tiny_url=requests.get(link_to_shorten).content
-	    tiny_soup=bs(tiny_url,"html.parser")
+		#send(news.get_text()+"\n")
+		head=heads[int(i/2)].get_text()
+		head=translator.translate(head, dest='ml').text
+		#news=newss[i].get_text()
+		news="\n"+links[i+1].get_text()
+		news=translator.translate(news, dest='ml').text
+		link= (links[i].find("a").get("href"))
+		# print(link)
+		link=re.sub("/url\?q=","",link)
+		link=re.sub("&.*","",link)
+		link_to_shorten="https://tinyurl.com/create.php?source=indexpage&url="+link
+		tiny_url=requests.get(link_to_shorten).content
+		tiny_soup=bs(tiny_url,"html.parser")
 
-	    shrt_link=tiny_soup.find_all('b')[1].get_text()
-	    print(shrt_link)
-	    send_message(head+"\n"+news+"\nRead more at: "+shrt_link+"\n")
+		shrt_link=tiny_soup.find_all('b')[1].get_text()
+		print(shrt_link)
+		send_message(head+"\n"+news+"\nRead more at: "+shrt_link+"\n")
 
-	    #rint("Read More:: "+link+"\n")
+		#rint("Read More:: "+link+"\n")
 
-	    #print("Read More:: "+link)
+		#print("Read More:: "+link)
 
 
 
@@ -108,17 +109,33 @@ def youtube():
 	search_terms=["malayalam funny","malayalam trending" ,"comedy malayalam", "fun"]
 	search_term=random.choice(search_terms)
 	results = YoutubeSearch(search_term, max_results=10).to_dict()
-
-	for i in range(2):
+	count=0
+	for i in range(100):
 		title=results[i]["title"]
 		channel=results[i]["channel"]
 		views=results[i]["views"]
 		duration=results[i]["duration"]
 		link="https://www.youtube.com"+results[i]["url_suffix"]
-		send_message(title+"\nChanel: "+channel+"\nViews: "+str(views)+"\nDuration: "+str(duration)+"\nLink: "+link)
+		if verify("youtube",results[i]["url_suffix"]) ==False:
+			send_message(title+"\nChanel: "+channel+"\nViews: "+str(views)+"\nDuration: "+str(duration)+"\nLink: "+link)
+			count+=1
+		else:
+			continue
+		if count==3:
+			break
+def verify(media,url):
+	op=open("memory.json","r")
 
-
-
+	data=json.load(op)
+	if url in data[media]:
+		return True
+	else:
+		data[media].append(url)
+		os.remove("memory.json")
+		print(data)
+		f=open("memory.json","w")
+		json.dump(data,f, indent=4)
+		return False
 def send(x):
 	print("reached inside send function")
 	text_box = browser.find_elements_by_xpath(
@@ -168,7 +185,7 @@ def image_downloader_and_sender(url,file_type):
 		time.sleep(2)
 		# To send a Document(PDF, Word file, PPT)
 		browser.find_element_by_css_selector("input[type=file]").send_keys(docPath)
-		time.sleep(2)
+		time.sleep(4)
 		whatsapp_send_button = browser.find_element_by_css_selector("span[data-icon=send]")
 		whatsapp_send_button.click()
 
@@ -181,17 +198,28 @@ def insta_scraper(insta_account):
 	data = json.loads(page_json)
 	non_bmp_map = dict.fromkeys(range(0x10000, sys.maxunicode + 1), 0xfffd)
 	post = data['entry_data']['ProfilePage'][0]['graphql']['user']['edge_owner_to_timeline_media']['edges']
-	for i in range(2):
+	count=0
+	for i in range(100):
 		display_url=post[i]["node"]["display_url"]
 		type=post[i]["node"]["__typename"]
 		if type=="GraphImage":
 			image_likes=post[i]["node"]["edge_liked_by"]["count"]
-			image_downloader_and_sender(display_url,type)
+			if verify("instagram",display_url)==False:
+				image_downloader_and_sender(display_url,type)
+				count+=1
+			else:
+				continue
 		elif type=="GraphVideo":
 			video_url=post[i]["node"]["video_url"]
 			video_views=post[i]["node"]["video_view_count"]
 			video_likes=post[i]["node"]["edge_liked_by"]["count"]
-			image_downloader_and_sender(video_url,"GraphVideo")
+			if verify("instagram",display_url)==False:
+				image_downloader_and_sender(video_url,"GraphVideo")
+				count+=1
+			else:
+				continue
+		if count==3:
+			break
 
 
 
@@ -199,14 +227,11 @@ def news(search="kerala"):
 
 	print(search)
 	from newsapi import NewsApiClient as nac
-
 	newsapi = nac(api_key='a7ad3c210edc417699e9ef55f83e6df2')
-
 	# /v2/top-headlines
 	top_headlines = newsapi.get_top_headlines(sources='the-hindu,the-times-of-india,google-news-in',
 											  language='en',
 											  )
-
 	# /v2/everything
 	articles = newsapi.get_everything(q=search,
 									  sources='the-hindu,the-times-of-india,google-news-in',
@@ -219,20 +244,46 @@ def news(search="kerala"):
 
 
 	for i in range(5):
-
 		send_message("*"+articles["articles"][i]["title"].upper()+"*"+"\n"+articles["articles"][i]["description"]+"\nRead more: "+articles["articles"][i]["url"])
 		# send("Read more: "+articles["articles"][i]["url"] )
 
 def top_lines():
-	from newsapi import NewsApiClient as nac
-	newsapi = nac(api_key='a7ad3c210edc417699e9ef55f83e6df2')
-	top_headlines = newsapi.get_top_headlines(sources='the-hindu,the-times-of-india,google-news-in',
-											  language='en',
-											  )
-	for i in range(5):
-		send("*"+top_headlines["articles"][i]["title"].upper()+"*"+"\n"+top_headlines["articles"][i]["description"])
-		#send(top_headlines["articles"][i]["description"]+"\n")
-		send("Read more: "+top_headlines["articles"][i]["url"])
+	import requests
+	from bs4 import BeautifulSoup as bs
+
+	main_url="https://www.mathrubhumi.com/"
+	content=requests.get(main_url).content
+	soup=bs(content, "html.parser")
+	titles=soup.find_all("h1",attrs={"class":"topmaintitle"})
+	s_titles=soup.find_all("h3",attrs={"class":"topmainsubtitleh"})
+	title_list=[]
+	stitle_list=[]
+	for head in titles:
+		title_list.append(head.get_text())
+		link=head.find("a").get("href")
+		url=main_url+link
+		content=requests.get(url).content
+		soup=bs(content, "html.parser")
+		para=soup.find_all("p")
+		for i in para:
+			title_list.append(i.get_text())
+	for s_title in s_titles:
+		stitle_list.append(s_title.get_text()+"\n")
+		try:
+
+			link=s_title.find("a").get("href")
+			url=main_url+link
+			content=requests.get(url).content
+			soup=bs(content, "html.parser")
+			para=soup.find_all("p")
+			for i in para:
+
+				stitle_list.append(i.get_text()+"\n\n")
+		except Exception as e:
+			print (e)
+	send_message("".join(title_list))
+	send_message("".join(stitle_list))
+
 
 def morning():
 	news_topics=["kerala latest","malayalam hot news","headlines","funny news malayalam"]
@@ -244,10 +295,10 @@ def insta():
 	account=random.choice(accounts)
 	insta_scraper(account)
 
-schedule.every(3).hours.do(youtube)
-schedule.every(2).hours.do(insta)
+schedule.every(4).minutes.do(youtube)
+schedule.every(1).minutes.do(top_lines)
 schedule.every().day.at("07:30").do(news)
-schedule.every(0.2).minutes.do(morning)
+schedule.every(10).minutes.do(morning)
 
 
 
