@@ -17,10 +17,7 @@ import random
 import time
 import requests
 import schedule
-try:
-	import autoit
-except ModuleNotFoundError:
-	pass
+
 
 repeat = ''
 
@@ -29,15 +26,179 @@ browser.get('https://web.whatsapp.com')
 wait = WebDriverWait(browser, 3)
 
 
-def send_message(message):
+def close_json(data):
+	os.remove("verify.json")
+	print(data)
+	f=open("verify.json","w")
+	json.dump(data,f, indent=4)
+
+def admin(id,media,message):
+
+	op=open("verify.json","r")
+	print(message)
+	print(message.split())
+	data=json.load(op)
+
+	if media.lower()=="yt" or media.lower()=="news":
+
+
+		message="ABC entertainments 🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸\n"+message+"\n➖➖➖➖➖➖➖➖➖➖\n"
+		data[id]={}
+		data[id]["payload"]=data.get("payload", message)
+		send_message((message+"UNIQUE_ID: "+str(id)),"admin")
+
+		close_json(data)
+
+	elif media.lower()=="instapic":
+
+		url=message.split()[0]
+		caption="ABC entertainments 🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸\n"+str(message.split()[1])+"People Liked this \n➖➖➖➖➖➖➖➖➖➖\n"
+
+		data[id]={}
+		data[id]["link"]=data.get("link", url)
+		data[id]["payload"]=data.get("payload",caption )
+		image_downloader_and_sender(url,"GraphImage","admin",caption+str(id))
+
+		close_json(data)
+
+	elif media.lower()=="instavideo":
+
+
+		url=message.split()[0]
+		caption="ABC entertainments 🔸🔸🔸🔸🔸🔸🔸🔸🔸🔸\n"+str(message.split()[1])+"People Liked this \n➖➖➖➖➖➖➖➖➖➖\n"
+		#send_message((message+"UNIQUE_ID"+id),"admin")
+		data[id]={}
+		data[id]["link"]=data.get("link", url)
+		data[id]["payload"]=data.get("payload",caption )
+		image_downloader_and_sender(url,"GraphVideo","admin",caption+str(id))
+		close_json(data)
+
+	elif id=="end":#or media=="end" or message="end":
+		while True:
+
+			target="Admins"
+			try:
+
+				x_arg = '//span[contains(@title,' + target + ')]' #/html/body/div[1]/div/div/div[3]/div/div[2]/div/div/div/div[1]/div/div/div[2]/div[1]/div[1]/div/span
+				ct = 0
+				try:
+					op=open("verify.json","r")
+
+					data=json.load(op)
+					# group_title = wait.until(EC.presence_of_element_located((By.XPATH, x_arg)))
+					# group_title.click()
+					browser.find_element_by_css_selector("span[title='" + target + "']").click()
+					print("found target")
+					admin_message=browser.find_elements_by_class_name("eRacY")[-1]
+					print(admin_message.text)
+					if "approved" in admin_message.text.lower():
+						id=admin_message.text.lower().split()[1]
+						print("approved found")
+						print(id)
+						print(data)
+						if "insv" in id:
+							link=data[id]["link"]
+							caption=data[id]["payload"]
+							send("sending"+id+" to all groups")
+							image_downloader_and_sender(link,"GraphVideo","verified",caption)
+						if "insi" in id:
+							link=data[id]["link"]
+							caption=data[id]["payload"]
+							send("sending"+id+" to all groups")
+							image_downloader_and_sender(link,"GraphImage","verified",caption)
+						elif "yt" in id or "nws" in id:
+							message=data[id]["payload"]
+							send("sending"+id+" to all groups")
+							send_message(message,"verified")
+						return False
+					elif "edit" in admin_message.text.lower():
+						id=admin_message.text.lower().split()[1]
+						while True:
+							admin_message=browser.find_elements_by_class_name("eRacY")[-1]
+							if "edited" in admin_message.text.lower() or "":
+								payload=re.sub("edited","",admin_message.text)
+								payload=re.sub("Edited","",admin_message.text)
+								data[id]["payload"]=payload
+
+								if "insi" in id:
+
+									link=data[id]["link"]
+									caption=data[id]["payload"]
+									send("sending"+id+" to all groups")
+									image_downloader_and_sender(link,"GraphImage","verified",caption)
+
+								elif "insv" in id:
+									link=data[id]["link"]
+									caption=data[id]["payload"]
+									send("sending"+id+" to all groups")
+									image_downloader_and_sender(link,"GraphVideo","verified",caption)
+								elif "yt" in id or "nws" in id:
+									message=data[id]["payload"]
+									send("sending"+id+" to all groups")
+									send_message(message,"verified")
+
+
+
+								break
+						return False
+					elif "ok" in admin_message.text.lower():
+						return False
+						break
+
+					# elif "nope" in admin_message.text.lower():
+					# 	return True
+					# 	break
+
+				except:
+					ct += 1
+					time.sleep(1)
+					print("")
+			except Exception as e:
+				print(e)
+
+def send_message(message,user):
 	global  wait, browser
 	print(message,"reached send")
-	for i in range(4):
-		target="Bot"+str(i)
+	if user=="verified":
+
+		for i in range(4):
+			target="Bot"+str(i)
+			try:
+				x_arg = '//span[contains(@title,' + target + ')]' #/html/body/div[1]/div/div/div[3]/div/div[2]/div/div/div/div[1]/div/div/div[2]/div[1]/div[1]/div/span
+				ct = 0
+				while ct != 10:
+					try:
+						# group_title = wait.until(EC.presence_of_element_located((By.XPATH, x_arg)))
+						# group_title.click()
+						browser.find_element_by_css_selector("span[title='" + target + "']").click()
+						print("found target")
+						break
+					except:
+						ct += 1
+						time.sleep(1)
+						print(" notfound target")
+
+				input_box = browser.find_elements_by_xpath(
+					'//*[@id="main"]/footer/div[1]/div[2]/div/div[2]')[0]
+				for ch in message:
+					if ch == "\n":
+						ActionChains(browser).key_down(Keys.SHIFT).key_down(Keys.ENTER).key_up(Keys.ENTER).key_up(Keys.SHIFT).key_up(Keys.BACKSPACE).perform()
+					else:
+						input_box.send_keys(ch)
+				time.sleep(3)
+				input_box.send_keys(Keys.ENTER)
+				print("Message sent successfuly")
+
+			except Exception as e :#NoSuchElementException:
+				print(e)
+				return
+	elif user=="admin":
+
+		target="Admins"
 		try:
 			x_arg = '//span[contains(@title,' + target + ')]' #/html/body/div[1]/div/div/div[3]/div/div[2]/div/div/div/div[1]/div/div/div[2]/div[1]/div[1]/div/span
 			ct = 0
-			while ct != 10:
+			while ct!=10:
 				try:
 					# group_title = wait.until(EC.presence_of_element_located((By.XPATH, x_arg)))
 					# group_title.click()
@@ -48,6 +209,7 @@ def send_message(message):
 					ct += 1
 					time.sleep(1)
 					print(" notfound target")
+
 			input_box = browser.find_elements_by_xpath(
 				'//*[@id="main"]/footer/div[1]/div[2]/div/div[2]')[0]
 			for ch in message:
@@ -55,15 +217,13 @@ def send_message(message):
 					ActionChains(browser).key_down(Keys.SHIFT).key_down(Keys.ENTER).key_up(Keys.ENTER).key_up(Keys.SHIFT).key_up(Keys.BACKSPACE).perform()
 				else:
 					input_box.send_keys(ch)
-			time.sleep(4)
+			time.sleep(3)
 			input_box.send_keys(Keys.ENTER)
 			print("Message sent successfuly")
 
 		except Exception as e :#NoSuchElementException:
 			print(e)
 			return
-
-
 
 def fn(query):
 
@@ -96,33 +256,50 @@ def fn(query):
 
 		shrt_link=tiny_soup.find_all('b')[1].get_text()
 		print(shrt_link)
-		send_message(head+"\n"+news+"\nRead more at: "+shrt_link+"\n")
-
+		full="1234567890"
+		id="".join(random.sample(full,7))
+		# send_message(head+"\n"+news+"\nRead more at: "+shrt_link+"\n
+		message=head+"\n"+news+"\nRead more at: "+shrt_link+"\n"
+		admin("nws"+id,"news",message)
 		#rint("Read More:: "+link+"\n")
+def random_id():
 
+	full="1234567890"
+	id="".join(random.sample(full,3))
+	return id
 		#print("Read More:: "+link)
-
-
-
 def youtube():
 	from youtube_search import YoutubeSearch
-	search_terms=["malayalam funny","malayalam trending" ,"comedy malayalam", "fun"]
-	search_term=random.choice(search_terms)
-	results = YoutubeSearch(search_term, max_results=10).to_dict()
+	# search_terms=["malayalam funny","malayalam trending" ,"comedy malayalam", "fun"]
+	# search_term=random.choice(search_terms)
+	# results = YoutubeSearch(search_term, max_results=10).to_dict()
 	count=0
 	for i in range(100):
+		search_terms=["malayalam funny","malayalam trending" ,"comedy malayalam", "fun"]
+		search_term=random.choice(search_terms)
+		results = YoutubeSearch(search_term, max_results=10).to_dict()
 		title=results[i]["title"]
 		channel=results[i]["channel"]
 		views=results[i]["views"]
 		duration=results[i]["duration"]
+		id=results[i]["id"]
 		link="https://www.youtube.com"+results[i]["url_suffix"]
-		if verify("youtube",results[i]["url_suffix"]) ==False:
-			send_message(title+"\nChanel: "+channel+"\nViews: "+str(views)+"\nDuration: "+str(duration)+"\nLink: "+link)
+		if verify("youtube",id) ==False:
+			message=title+"\nChanel: "+channel+"\nViews: "+str(views)+"\nDuration: "+str(duration)+"\nLink: "+link
+			admin("yt"+random_id(),"yt",message)
+			# send_message(title+"\nChanel: "+channel+"\nViews: "+str(views)+"\nDuration: "+str(duration)+"\nLink: "+link)
 			count+=1
+			# if admin("yt"+random_id(),"yt",message):
+			# 	print("reached nope")
+			# 	count=0
+			# 	continue
 		else:
 			continue
 		if count==3:
+			msg="end"
+			admin(msg,msg,msg)
 			break
+
 def verify(media,url):
 	op=open("memory.json","r")
 
@@ -136,17 +313,16 @@ def verify(media,url):
 		f=open("memory.json","w")
 		json.dump(data,f, indent=4)
 		return False
+
 def send(x):
 	print("reached inside send function")
 	text_box = browser.find_elements_by_xpath(
 		'//*[@id="main"]/footer/div[1]/div[2]/div/div[2]')[0]
 
 
-	text_box.send_keys(x)
-	sleep(5)
-	text_box.send_keys(Keys.ENTER)
+	text_box.send_keys(x+Keys.ENTER)
 
-def image_downloader_and_sender(url,file_type):
+def image_downloader_and_sender(url,file_type,user,caption):
 	if file_type=="GraphImage":
 		response = requests.get(url)
 		file = open("test.jpg", "wb")
@@ -162,8 +338,47 @@ def image_downloader_and_sender(url,file_type):
 		docPath = os.getcwd() + "/test.mp4"
 
 	# Attachment Drop Down Menu
-	for i in range(4):
-		target=("Bot"+str(i))
+	if user=="verified":
+		for i in range(4):
+			target=("Bot"+str(i))
+			try:
+				x_arg = '//span[contains(@title,' + target + ')]' #/html/body/div[1]/div/div/div[3]/div/div[2]/div/div/div/div[1]/div/div/div[2]/div[1]/div[1]/div/span
+				ct = 0
+				while ct != 10:
+					try:
+						# group_title = wait.until(EC.presence_of_element_located((By.XPATH, x_arg)))
+						# group_title.click()
+						browser.find_element_by_css_selector("span[title='" + target + "']").click()
+						print("found target")
+						break
+					except:
+						ct += 1
+						time.sleep(1)
+						print(" notfound target")
+			except Exception as e:
+				print(e)
+			clipButton = browser.find_elements_by_class_name("PVMjB")[-2]
+			clipButton.click()
+			time.sleep(2)
+			# To send a Document(PDF, Word file, PPT)
+			browser.find_element_by_css_selector("input[type=file]").send_keys(docPath)
+			time.sleep(3)
+			whatsapp_caption_feild = browser.find_elements_by_xpath(
+			'/html/body/div[1]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/div[1]/span/div/div[2]/div/div[3]/div[1]/div[2]')[-1]
+			message=caption
+			if "\n" in message:
+				for part in message.split('\n'):
+					whatsapp_caption_feild.send_keys(part)
+					ActionChains(browser).key_down(Keys.SHIFT).key_down(Keys.ENTER).key_up(Keys.SHIFT).key_up(Keys.ENTER).perform()
+				whatsapp_caption_feild.send_keys(Keys.ENTER)
+			else:
+				whatsapp_caption_feild.send_keys(message + Keys.ENTER)
+				print("Message sent successfuly")
+
+	elif user =="admin":
+
+
+		target="Admins"
 		try:
 			x_arg = '//span[contains(@title,' + target + ')]' #/html/body/div[1]/div/div/div[3]/div/div[2]/div/div/div/div[1]/div/div/div[2]/div[1]/div[1]/div/span
 			ct = 0
@@ -185,27 +400,40 @@ def image_downloader_and_sender(url,file_type):
 		time.sleep(2)
 		# To send a Document(PDF, Word file, PPT)
 		browser.find_element_by_css_selector("input[type=file]").send_keys(docPath)
-		time.sleep(4)
-		whatsapp_send_button = browser.find_element_by_css_selector("span[data-icon=send]")
-		whatsapp_send_button.click()
+		sleep(3)
+		whatsapp_caption_feild = browser.find_elements_by_xpath(
+		'/html/body/div[1]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/div[1]/span/div/div[2]/div/div[3]/div[1]/div[2]')[-1]
+		message=caption
+		if "\n" in message:
+			for part in message.split('\n'):
+				 whatsapp_caption_feild.send_keys(part)
+				 ActionChains(browser).key_down(Keys.SHIFT).key_down(Keys.ENTER).key_up(Keys.SHIFT).key_up(Keys.ENTER).perform()
+			whatsapp_caption_feild.send_keys(Keys.ENTER)
+		else:
+			whatsapp_caption_feild.send_keys(message + Keys.ENTER)
+			print("Message sent successfuly")
 
-def insta_scraper(insta_account):
-
-	r = requests.get('https://www.instagram.com/'+insta_account+'/')
-	soup = bs(r.text, 'lxml')
-	script = soup.find('script', text=lambda t: t.startswith('window._sharedData'))
-	page_json = script.string.split(' = ', 1)[1].rstrip(';')
-	data = json.loads(page_json)
-	non_bmp_map = dict.fromkeys(range(0x10000, sys.maxunicode + 1), 0xfffd)
-	post = data['entry_data']['ProfilePage'][0]['graphql']['user']['edge_owner_to_timeline_media']['edges']
+def insta_scraper():
 	count=0
 	for i in range(100):
+		accounts=["criticscut","9gag","ffc.trolls","trollmovies","ar._beatz"]
+		account=random.choice(accounts)
+		r = requests.get('https://www.instagram.com/'+account+'/')
+		soup = bs(r.text, 'lxml')
+		script = soup.find('script', text=lambda t: t.startswith('window._sharedData'))
+		page_json = script.string.split(' = ', 1)[1].rstrip(';')
+		data = json.loads(page_json)
+		non_bmp_map = dict.fromkeys(range(0x10000, sys.maxunicode + 1), 0xfffd)
+		post = data['entry_data']['ProfilePage'][0]['graphql']['user']['edge_owner_to_timeline_media']['edges']
+
 		display_url=post[i]["node"]["display_url"]
 		type=post[i]["node"]["__typename"]
 		if type=="GraphImage":
 			image_likes=post[i]["node"]["edge_liked_by"]["count"]
+			image_id="insi"+random_id()
 			if verify("instagram",display_url)==False:
-				image_downloader_and_sender(display_url,type)
+				admin(image_id,"instapic",display_url+" "+str(image_likes))
+				#image_downloader_and_sender(display_url,type)
 				count+=1
 			else:
 				continue
@@ -213,92 +441,31 @@ def insta_scraper(insta_account):
 			video_url=post[i]["node"]["video_url"]
 			video_views=post[i]["node"]["video_view_count"]
 			video_likes=post[i]["node"]["edge_liked_by"]["count"]
+			video_id="insv"+random_id()
 			if verify("instagram",display_url)==False:
-				image_downloader_and_sender(video_url,"GraphVideo")
+				admin(video_id,"instavideo",(video_url+" "+str(video_likes)))
+				# image_downloader_and_sender(video_url,"GraphVideo")
 				count+=1
 			else:
 				continue
-		if count==3:
+		if count==6:
+			msg="end"
+			admin(msg,msg,msg)
 			break
 
-
-
-def news(search="kerala"):
-
-	print(search)
-	from newsapi import NewsApiClient as nac
-	newsapi = nac(api_key='a7ad3c210edc417699e9ef55f83e6df2')
-	# /v2/top-headlines
-	top_headlines = newsapi.get_top_headlines(sources='the-hindu,the-times-of-india,google-news-in',
-											  language='en',
-											  )
-	# /v2/everything
-	articles = newsapi.get_everything(q=search,
-									  sources='the-hindu,the-times-of-india,google-news-in',
-
-									  from_param='2020-07-20',
-									  to='2020-07-31',
-									  language='en',
-									  sort_by="publishedAt"
-									  )
-
-
-	for i in range(5):
-		send_message("*"+articles["articles"][i]["title"].upper()+"*"+"\n"+articles["articles"][i]["description"]+"\nRead more: "+articles["articles"][i]["url"])
-		# send("Read more: "+articles["articles"][i]["url"] )
-
-def top_lines():
-	import requests
-	from bs4 import BeautifulSoup as bs
-
-	main_url="https://www.mathrubhumi.com/"
-	content=requests.get(main_url).content
-	soup=bs(content, "html.parser")
-	titles=soup.find_all("h1",attrs={"class":"topmaintitle"})
-	s_titles=soup.find_all("h3",attrs={"class":"topmainsubtitleh"})
-	title_list=[]
-	stitle_list=[]
-	for head in titles:
-		title_list.append(head.get_text())
-		link=head.find("a").get("href")
-		url=main_url+link
-		content=requests.get(url).content
-		soup=bs(content, "html.parser")
-		para=soup.find_all("p")
-		for i in para:
-			title_list.append(i.get_text())
-	for s_title in s_titles:
-		stitle_list.append(s_title.get_text()+"\n")
-		try:
-
-			link=s_title.find("a").get("href")
-			url=main_url+link
-			content=requests.get(url).content
-			soup=bs(content, "html.parser")
-			para=soup.find_all("p")
-			for i in para:
-
-				stitle_list.append(i.get_text()+"\n\n")
-		except Exception as e:
-			print (e)
-	send_message("".join(title_list))
-	send_message("".join(stitle_list))
-
-
 def morning():
-	news_topics=["kerala latest","malayalam hot news","headlines","funny news malayalam"]
+	news_topics=["kerala latest","kerala headlines","latest funny news malayalam"]
 	news_topic=random.choice(news_topics)
 	fn(news_topic)
 
-def insta():
-	accounts=["criticscut","9gag","ffc.trolls","trollmovies","ar._beatz"]
-	account=random.choice(accounts)
-	insta_scraper(account)
 
-schedule.every(4).minutes.do(youtube)
-schedule.every(1).minutes.do(top_lines)
-schedule.every().day.at("07:30").do(news)
-schedule.every(10).minutes.do(morning)
+
+schedule.every(0.5).minutes.do(youtube)
+# schedule.every(0.3).minutes.do(insta_scraper)
+
+schedule.every(1).minutes.do(morning)
+#schedule.every().day.at("07:30").do(news)
+#schedule.every(10).minutes.do(morning)
 
 
 
