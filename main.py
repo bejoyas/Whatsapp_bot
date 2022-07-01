@@ -43,7 +43,7 @@ def admin(id,media,message):
 	if media.lower()=="yt" or media.lower()=="news":
 
 
-		message="⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️\n*വിട്ട് കളയണം 1.0*"+" 🌀️"+date_now()+"\n〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n*"+message+"\n➖➖➖➖➖➖➖➖➖➖\n\nto advertise here contact angel peter\n\n"
+		message="⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️🌀️"+date_now()+"\n〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n*"+message"
 		data[id]={}
 		data[id]["payload"]=data.get("payload", message)
 		send_message((message+"UNIQUE_ID: "+str(id)),"admin")
@@ -53,7 +53,7 @@ def admin(id,media,message):
 	elif media.lower()=="instapic":
 
 		url=message.split()[0]
-		caption="*"+str(message.split()[1])+"*"+" *K*"+" 👍️\n⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️\n*വിട്ട് കളയണം 1.0*"+" 🌀️"+date_now()+"©️ *2020*\n"
+		caption="*"+str(message.split()[1])+"*"+" *K*"+" 👍️\n⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️\n🌀️"+date_now()+"©️ *2020*\n"
 		data[id]={}
 		data[id]["link"]=data.get("link", url)
 		data[id]["payload"]=data.get("payload",caption )
@@ -65,7 +65,7 @@ def admin(id,media,message):
 
 
 		url=message.split()[0]
-		caption="*"+str(message.split()[1])+"*"+" *K*"+" 👍️\n⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️\n*വിട്ട് കളയണം 1.0*"+" 🌀️"+date_now()+"©️ *2020*\n"
+		caption="*"+str(message.split()[1])+"*"+" *K*"+" 👍️\n⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⬇️🌀️"+date_now()+"©️ *2020*\n"
 		#send_message((message+"UNIQUE_ID"+id),"admin")
 		data[id]={}
 		data[id]["link"]=data.get("link", url)
